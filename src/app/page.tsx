@@ -12,6 +12,11 @@ const PLACES = ["Forest", "Ocean", "Mountain", "Sky", "Space", "Enchanted Garden
 const ELEMENTS = ["Fire", "Water", "Earth", "Air", "Light", "Dream"];
 
 export default function Home() {
+  // Passcode gate
+  const [unlocked, setUnlocked] = useState(false);
+  const [passcode, setPasscode] = useState("");
+  const [passcodeError, setPasscodeError] = useState(false);
+
   // Quiz state
   const [step, setStep] = useState(0); // 0=style, 1=color, 2=personality, 3=place, 4=element, 5=generating, 6=card
   const [style, setStyle] = useState("");
@@ -26,6 +31,16 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState("");
   const cardRef = useRef<HTMLDivElement>(null);
+
+  // Check passcode
+  const handlePasscode = () => {
+    if (passcode.toLowerCase() === "sloan") {
+      setUnlocked(true);
+      setPasscodeError(false);
+    } else {
+      setPasscodeError(true);
+    }
+  };
 
   // Handle a quiz option selection
   const handleSelect = (value: string) => {
@@ -172,18 +187,64 @@ export default function Home() {
         ))}
       </div>
 
+      {/* Passcode Gate */}
+      {!unlocked && (
+        <div className="relative z-10 flex flex-col items-center gap-6">
+          <div className="text-center">
+            <div className="text-6xl mb-4">🔒</div>
+            <h1 className="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-pink-400 to-purple-400 mb-2">
+              Baby Spirit Animal
+            </h1>
+            <p className="text-lg text-purple-200 mb-2">
+              Trading Card Creator ✨
+            </p>
+            <p className="text-sm text-purple-300/70">
+              Enter the secret passcode to begin
+            </p>
+          </div>
+
+          <div className="w-full max-w-xs flex flex-col items-center gap-3">
+            <input
+              type="text"
+              value={passcode}
+              onChange={(e) => {
+                setPasscode(e.target.value);
+                setPasscodeError(false);
+              }}
+              onKeyDown={(e) => e.key === "Enter" && handlePasscode()}
+              placeholder="Type the magic word..."
+              className="w-full text-center text-lg font-bold py-3 px-6 rounded-xl bg-white/10 border-2 border-white/20 text-white placeholder-white/30 outline-none focus:border-pink-400 focus:bg-white/15 transition-all"
+              autoFocus
+            />
+            <button
+              onClick={handlePasscode}
+              className="bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-400 hover:to-purple-400 text-white font-black py-3 px-10 rounded-full text-lg transition-all duration-200 hover:scale-105 active:scale-95 shadow-lg shadow-purple-500/30"
+            >
+              Enter ✨
+            </button>
+            {passcodeError && (
+              <p className="text-red-400 text-sm font-semibold animate-pulse">
+                Hmm, that&apos;s not it! Try again.
+              </p>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Title */}
-      <div className="text-center mb-8 relative z-10">
-        <h1 className="text-4xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-pink-400 to-purple-400 drop-shadow-lg mb-2">
-          Baby Spirit Animal
-        </h1>
-        <p className="text-xl md:text-2xl font-bold text-purple-200">
-          Trading Card Creator ✨
-        </p>
-      </div>
+      {unlocked && (
+        <div className="text-center mb-8 relative z-10">
+          <h1 className="text-4xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-pink-400 to-purple-400 drop-shadow-lg mb-2">
+            Baby Spirit Animal
+          </h1>
+          <p className="text-xl md:text-2xl font-bold text-purple-200">
+            Trading Card Creator ✨
+          </p>
+        </div>
+      )}
 
       {/* Quiz Section (steps 0-4) */}
-      {step < 5 && (
+      {unlocked && step < 5 && (
         <div className="relative z-10 w-full max-w-lg">
           {/* Progress dots */}
           <div className="flex justify-center gap-3 mb-6">
@@ -237,7 +298,7 @@ export default function Home() {
       )}
 
       {/* Loading Section (step 5) */}
-      {step === 5 && (
+      {unlocked && step === 5 && (
         <div className="relative z-10 text-center">
           <div className="text-6xl animate-bounce mb-4">🔮</div>
           <p className="text-xl font-bold text-purple-200 animate-pulse">
@@ -256,7 +317,7 @@ export default function Home() {
       )}
 
       {/* Card Display Section (step 6) */}
-      {step === 6 && card && (
+      {unlocked && step === 6 && card && (
         <div className="relative z-10 flex flex-col items-center gap-6">
           <TradingCard ref={cardRef} card={card} imageUrl={imageUrl} />
 

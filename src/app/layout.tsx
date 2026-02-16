@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Fredoka } from "next/font/google";
+import { Analytics } from "@vercel/analytics/react";
 import "./globals.css";
 
 // Kid-friendly rounded font
@@ -22,6 +23,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${fredoka.className} antialiased`}>
         {children}
+        <Analytics />
       </body>
     </html>
   );
